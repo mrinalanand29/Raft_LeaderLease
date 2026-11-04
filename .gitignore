@@ -1,0 +1,22 @@
+﻿# Exclude run_cluster
+run_cluster.sh
+
+# JetBrains / IntelliJ files
+.idea/
+*.iml
+
+# Python cache & build files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.venv/
+env/
+venv/
+ENV/

@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+message Entry {
+  int32 term = 1;
+  string key = 2;
+  string value = 3;
+}
+
+message ReplicateLogRequest{
+  int32 term = 1;           // current term of the leader, very IMPORTANT
+  int32 leader_id = 2;      // id of the leader, 0 to N-1 where N = total servers
+  repeated Entry entries = 3; // new data to sync
+  int32 prev_log_index = 4; // important metadata for log correctness
+  int32 prev_log_term = 5;  // important metadata for log correctness
+  int32 leader_commit = 6;  // what index have been received by the majority
+  int32 lease_interval_duration = 7;
+  int32 curr_heartbeat = 8;
+}
+
+message ReplicateLogResponse {
+  int32 node_id = 1;            // Node ID of the follower
+  int32 current_term = 2;          // current term
+  int32 ack = 3;  // acknowledgement of the number of log entries received
+  bool success = 4;   // whether log_request was successful
+  int32 curr_heartbeat = 5;
+}
+
+message VoteRequest {
+  int32 term = 1;           // current term of the candidate, very IMPORTANT
+  int32 candidate_id = 2;    // id of the candidate, 0 -  N-1 where N = total servers
+  int32 last_log_index = 3; // important metadata for election correctness
+  int32 last_log_term = 4;  // important metadata for election correctness, explain later
+}
+
+message VoteResponse {
+  int32 term = 1;   // current term of the receiving node
+  bool vote_granted = 2;  // yes or no
+  int32 voter_id = 3;     // voter ID
+  int32 remaining_lease_duration = 5;
+} 
+
+//Client RPCs
+message ServeClientArgs {
+  string Type = 1;
+  string Var = 2;
+  int32 Value = 3;
+}
+
+message ServeClientReply {
+  string Data = 1;
+  int32 LeaderID = 2;
+  bool Success = 3;
+}
+
+service Raft {
+  rpc ReplicateLog(ReplicateLogRequest) returns (ReplicateLogResponse) {}
+  rpc RequestVote(VoteRequest) returns (VoteResponse) {}
+  rpc ServeClient (ServeClientArgs) returns (ServeClientReply) {}
+
+}
